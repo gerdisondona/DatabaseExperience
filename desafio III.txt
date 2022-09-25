@@ -1,0 +1,317 @@
+-- Schema desafio
+DROP SCHEMA IF EXISTS `desafio` ;
+
+CREATE SCHEMA IF NOT EXISTS `desafio` DEFAULT CHARACTER SET utf8 ;
+USE `desafio` ;
+
+-- Table Clients
+DROP TABLE IF EXISTS Clients ;
+
+CREATE TABLE IF NOT EXISTS `desafio`.`Clients` (
+  `idClient` INT AUTO_INCREMENT PRIMARY KEY,
+  `Address` VARCHAR(100) NULL
+);
+
+DROP TABLE IF EXISTS Clients_PF ;
+
+CREATE TABLE IF NOT EXISTS `desafio`.`Clients_PF` (
+  `idClient` INT,
+  `CPF` CHAR(11) NOT NULL,
+  `Fname` VARCHAR(10) NOT NULL,
+  `Minit` VARCHAR(3) NULL,
+  `Lname` VARCHAR(20) NULL,
+  CONSTRAINT `unique_CPF_cliente` UNIQUE (`CPF`),
+   CONSTRAINT `fk_Clients_PF_Clients`
+    FOREIGN KEY (`idClient`)
+    REFERENCES `desafio`.`Clients` (`idClient`)
+);
+
+DROP TABLE IF EXISTS Clients_PJ ;
+
+CREATE TABLE IF NOT EXISTS `desafio`.`Clients_PJ` (
+  `idClient` INT,
+  `CNPJ` CHAR(11) NOT NULL,
+  `RazaoSocial` VARCHAR(100) NULL,
+  CONSTRAINT `unique_CPF_cliente` UNIQUE (`CNPJ`) ,
+  CONSTRAINT `fk_Clients_PJ_Clients`
+    FOREIGN KEY (`idClient`)
+    REFERENCES `desafio`.`Clients` (`idClient`)
+);
+
+alter table clients auto_increment = 1;
+
+-- Table `desafio`.`Produto`
+DROP TABLE IF EXISTS `desafio`.`product` ;
+
+CREATE TABLE IF NOT EXISTS `desafio`.`product` (
+  `idProduct` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `Pname` VARCHAR(30) NOT NULL,
+  `classification_kids` bool default false,
+  `category` ENUM('Eletronico','Vestimenta','Brinquedos','Moveis','Alimentos')NOT NULL,
+  `avaliacao` FLOAT default 0,
+  `size` VARCHAR(10)
+);
+
+-- Table `desafio`.`orders`
+DROP TABLE IF EXISTS `desafio`.`orders` ;
+
+CREATE TABLE IF NOT EXISTS `desafio`.`orders` (
+  `idOrder` INT AUTO_INCREMENT PRIMARY KEY,
+  `idOrdeClient` INT NOT NULL,
+  `orderStatus` ENUM('Cancelado','Confirmado', 'Em processamento') NULL DEFAULT 'Em processamento',
+  `ordersDescription` VARCHAR(255) NULL,
+  `sendValue` FLOAT default 10,
+  `paymentCash` bool default false,
+  CONSTRAINT `fk_orders_Cliente`
+    FOREIGN KEY (`idOrdeClient`)
+    REFERENCES `desafio`.`Clients` (`idClient`)
+);
+
+-- Table `desafio`.`productStorage`
+DROP TABLE IF EXISTS `desafio`.`productStorage` ;
+
+CREATE TABLE IF NOT EXISTS `desafio`.`productStorage` (
+  `idProStorage` INT AUTO_INCREMENT PRIMARY KEY,
+  `storageLocation` VARCHAR(45) NOT NULL,
+  `quantity` INT DEFAULT 0
+);
+
+-- Table `desafio`.`supplier`
+DROP TABLE IF EXISTS `desafio`.`supplier` ;
+
+CREATE TABLE IF NOT EXISTS `desafio`.`supplier` (
+  `idSupplier` INT AUTO_INCREMENT PRIMARY KEY,
+  `SocialName` VARCHAR(255) NOT NULL,
+  `CNPJ` CHAR(15) NOT NULL,
+  `contact` CHAR(11) NOT NULL,
+   CONSTRAINT unique_supplier UNIQUE (CNPJ)
+);
+
+-- Table `desafio`.`seller'
+DROP TABLE IF EXISTS `desafio`.`seller` ;
+
+CREATE TABLE IF NOT EXISTS `desafio`.`seller` (
+  `idSeller` INT AUTO_INCREMENT PRIMARY KEY,
+  `SocialName` VARCHAR(255) NOT NULL,
+  `AbstName` VARCHAR(45) NULL,
+  `CNPJ` CHAR(15) NULL,
+  `CPF` CHAR(9) NULL,
+  `location` VARCHAR(255) NULL,
+  `contact` CHAR(11) NULL,
+  CONSTRAINT unique_cnpj_seller UNIQUE (CNPJ),
+  CONSTRAINT unique_cpf_seller UNIQUE (CPF)
+);
+
+-- Table `desafio`.`productSeller
+DROP TABLE IF EXISTS `desafio`.`productSeller` ;
+
+CREATE TABLE IF NOT EXISTS `desafio`.`productSeller` (
+  `idPseller` INT NOT NULL,
+  `idPproduct` INT NOT NULL,
+  `prodQuantity` INT default 1,
+  PRIMARY KEY (`idPseller`, `idPproduct`),
+  CONSTRAINT fk_product_seller foreign key(idPseller) references seller(idSeller),
+  CONSTRAINT fk_product_product foreign key (idPproduct) references product(idProduct)
+);
+
+-- Table `desafio`.`productOrder`
+DROP TABLE IF EXISTS `desafio`.`productOrder` ;
+
+CREATE TABLE IF NOT EXISTS `desafio`.`productOrder` (
+  `idPOproduct` INT NOT NULL,
+  `idPOorder` INT NOT NULL,
+  `poQuantity` INT DEFAULT 1,
+  `poStatus` ENUM('Disponivel', 'sem estoque') NULL DEFAULT 'Disponivel',  
+  PRIMARY KEY (`idPOproduct`, `idPOorder`),
+  CONSTRAINT fk_productorder_seller foreign key (idPOproduct) references product(idProduct),
+  CONSTRAINT fk_productorder_product FOREIGN KEY (idPOorder) REFERENCES  orders(idOrder)
+);
+
+-- Table `desafio`.`storageLocation`
+DROP TABLE IF EXISTS `desafio`.`storageLocation` ;
+
+CREATE TABLE IF NOT EXISTS `desafio`.`storageLocation` (
+  `idLproduct` INT NOT NULL,
+  `idLstorage` INT NOT NULL,
+  `location` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`idLproduct`, `idLstorage`),
+  CONSTRAINT `fk_storage_location_product`
+    FOREIGN KEY (`idLproduct`)
+    REFERENCES product(idProduct),
+  CONSTRAINT `fk_storage_location_storage`
+    FOREIGN KEY (`idLstorage`)
+    REFERENCES productStorage(idProStorage)
+);
+
+-- Table `desafio`.`productSupplier`
+DROP TABLE IF EXISTS `desafio`.`productSupplier` ;
+
+CREATE TABLE IF NOT EXISTS `desafio`.`productSupplier` (
+  `idPsSupplier` INT,
+  `idPsProduct` INT,
+  `quantity` INT not null,  
+  PRIMARY KEY (`idPsSupplier`, `idPsProduct`),
+  CONSTRAINT `fk_product_supplier_supplier`
+    FOREIGN KEY (`idPsSupplier`)
+    REFERENCES supplier(idSupplier),
+  CONSTRAINT `fk_product_supplier_productr`
+    FOREIGN KEY (`idPsProduct`)
+    REFERENCES product(idProduct)
+);
+
+DROP TABLE IF EXISTS `desafio`.`pagamento` ;
+
+CREATE TABLE IF NOT EXISTS pagamento(
+	idPagamento INT AUTO_INCREMENT PRIMARY KEY,	
+	idClient INT,
+	tipoPagamento ENUM('Boleto','Cartão', 'Dois Cartões'),
+	limiteAcessivel FLOAT,
+	DataValidade DATE,
+	CONSTRAINT fk_pagamento_client foreign key (idClient) references Clients(idClient)
+);
+
+DROP TABLE IF EXISTS `desafio`.`pagamentoOrders` ;
+
+CREATE TABLE IF NOT EXISTS pagamentoOrders(
+	idOrder int,
+	idPagamento INT,
+	PRIMARY KEY (`idOrder`, `idPagamento`)	
+);
+
+DROP TABLE IF EXISTS `desafio`.`entrega` ;
+
+CREATE TABLE IF NOT EXISTS entrega(
+	idEntrega int AUTO_INCREMENT PRIMARY KEY,	
+    idOrder int,
+	Status ENUM('Aguardando o pedido', 'Em transito para cidade', 'Saiu para entrega') NULL DEFAULT 'Aguardando o pedido',
+    codigoRastreio Char(6),
+    CONSTRAINT fk_entrega_order foreign key (idOrder) references Orders(idOrder)
+);
+
+
+use desafio;
+
+insert into clients(Address)
+values('Rua silva de parat 29, carangola - cidade das flores'),
+('Rua almeda 289, centro - cidade das flores'),
+('Avenida alemeda vinha 1009, centro - cidade das flores'),
+('Rua lareijras 861, centro - cidade das flores'),
+('Avenidade koller 19, centro - cidade das flores'),
+('Rua almeda das flores 28, centro - cidade das flores');
+
+
+insert into Clients_PF (idClient, Fname, Minit, Lname, CPF)
+values(1,'Maria','M','Silva', 123456789),
+(2,'Matheus','O','Pimentel', 987654321),
+(3,'Ricardo','F','Silva', 456789123),
+(4,'Julia','S','França', 789123456);
+
+insert into Clients_PJ(idClient, CNPJ, RazaoSocial)
+values(5, 12345678912,'Tecnologia das flores'),
+(6, 98765432112,'Rodas rodas');
+
+insert into pagamento(idClient, tipoPagamento, limiteAcessivel, DataValidade)
+values (1, 'Cartão', 1000, '2022-10-01'), 
+(2, 'Dois Cartões', 15000, '2023-10-01'), 
+(2, 'Boleto', 21000, '2022-12-01'), 
+(3, 'Boleto', 51000, '2025-01-01');
+
+insert into product(Pname, classification_kids, category, avaliacao, size) 
+values ('Fone de ouvido',false,'Eletronico','4', null),
+('Barbie Elsa',true,'Brinquedos','3', null),
+('Body Carters',false,'Vestimenta','5', null),
+('Microdone vedo - youtuver', false,'Eletronico','4', null),
+('Sofá retrátil', false,'Moveis','3', '3x57x80'),
+('Farinha de arroz', false,'Alimentos','2', null),
+('Fire Stick Amazon', false,'Eletronico','2', null);
+
+insert into orders (idOrdeClient, orderStatus, ordersDescription, sendValue, paymentCash)
+values(1, null, 'Compra via aplicativo', null, 1),
+(2, null, 'Compra via aplicativo', 50, 0),
+(3, 'Confirmado', null, null, 1),
+(4, null, 'Compra via web site', 150, 0);
+
+insert into pagamentoOrders 
+values(1,1),
+(4,3),
+(2,2),
+(2,3);
+
+insert into entrega(idOrder, status, codigoRastreio)
+values(1, 'Aguardando o pedido', 'a123c1'),
+(2, 'Em transito para cidade', 'b321c1'),
+(3, 'Saiu para entrega', 'c789c1'),
+(4, 'Em transito para cidade', 'c852c1');
+
+insert into productOrder(idPOproduct, idPOorder, poQuantity, poStatus)
+values(1,1,2,null),
+(2,1,1,null),
+(3,2,1,null);
+
+insert into productStorage(storageLocation, quantity) 
+values('Rio de janeiro', 1000),
+('Rio de janeiro', 500),
+('São Paulo', 10),
+('São Paulo', 100),
+('São Paulo', 10),
+('Brasilia', 60);
+
+insert into storageLocation(idLproduct, idLstorage, location)
+values(1,2,'RJ'),
+(2,6,'GO');
+
+insert into supplier(SocialName, CNPJ, contact) values ('Almeida e filhoes', 123456789123456, '21985474'),
+('Eletrônicos Silva', 854519649143457, '21985484'),
+('Eletrôncos Valma', 934567893934695, '21975474');
+
+
+insert into productSupplier(idPsSupplier, idPsProduct, quantity) 
+values (1, 1, 500),
+(1, 2, 400),
+(2, 4, 633),
+(3, 3, 5),
+(2, 5, 10);
+
+insert into seller(SocialName, AbstName, CNPJ, CPF, location, contact)
+values('Tech eletroics',null, 123456789456321,null, 'Rio de janeiro',219946287),
+('Botique Durgas',null, null, 123456783,'Rio de janeiro',219567895),
+('Kids World',null, 456789123654485, null, 'São Paulo', 1198657484);
+
+insert into productSeller(idPseller, idPproduct, prodQuantity)
+values(1, 6, 80),
+(2, 7, 10);
+
+
+/*
+* Quantos pedidos foram feitos por cada cliente?
+*/
+select nome, count(*) as qdt_pedido
+from  orders o
+left join (select  c.idClient, ifnull(cf.cpf, cj.cnpj)  as cpf_cnpj , ifnull(fname, razaosocial) as nome, c.Address  
+			from clients c
+			left join clients_pf cf on (c.idClient = cf.idClient)
+			left join clients_pj cj on (c.idClient = cj.idClient)) c on (o.idOrdeClient = c.idClient)
+group by nome;
+
+/*
+* Algum vendendor também é fornecedor?
+*/
+select * 
+from seller se
+inner join supplier su on (se.cnpj = su.cnpj);
+
+/*
+* Relação de produtos também fornecedores e estoque?
+*/
+select idProduct, pname, socialname, quantity 
+from product p
+left join productSupplier ps on (p.idProduct = ps.idPsProduct)
+left join supplier s on (ps.idPsSupplier = s.idSupplier) ;
+
+/*
+* Relação de nomes dos fornecedores e noemes dos produtos?
+*/
+select socialname as fornecedores, pname as produto
+from product p
+left join productSupplier ps on (p.idProduct = ps.idPsProduct)
+left join supplier s on (ps.idPsSupplier = s.idSupplier) ;
