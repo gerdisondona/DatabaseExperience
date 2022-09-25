@@ -1,0 +1,323 @@
+-- Schema desafioIV
+DROP SCHEMA IF EXISTS `desafioIV` ;
+
+CREATE SCHEMA IF NOT EXISTS `desafioIV` DEFAULT CHARACTER SET utf8 ;
+USE `desafioIV` ;
+
+-- Table `desafioIV`.`Montadora`
+DROP TABLE IF EXISTS `desafioIV`.`Montadora` ;
+
+CREATE TABLE IF NOT EXISTS `desafioIV`.`Montadora` (
+  `idMontadora` INT AUTO_INCREMENT PRIMARY KEY, 
+  `nome` VARCHAR(45) NULL
+);
+
+insert into Montadora (nome)
+values('Chevrolet'),
+('Volkswagen'), 
+('Fiat'), 
+('Renault'), 
+('Ford'); 
+
+-- Table `desafioIV`.`Modelo`
+DROP TABLE IF EXISTS `desafioIV`.`Modelo` ;
+
+CREATE TABLE IF NOT EXISTS `desafioIV`.`Modelo` (
+  `idModelo` INT AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(45) NULL,
+  `Montadora_idMontadora` INT NOT NULL,
+  CONSTRAINT `fk_Modelo_Montadora`
+    FOREIGN KEY (`Montadora_idMontadora`)
+    REFERENCES `desafioIV`.`Montadora` (`idMontadora`)
+);
+
+insert into Modelo (nome, Montadora_idMontadora)
+values('ONIX', 1),
+('CRUZE', 1),
+('SPIN', 1),
+('Amarok', 2),
+('Fox', 2),
+('Gol', 2),
+('Argo', 3),
+('Cronos', 3),
+('Doblo', 3),
+('Kwid', 4),
+('Oroch', 4),
+('Duster', 4),
+('Ka', 5),
+('Ranger', 5),
+('Fiesta', 5);
+
+-- Table `desafioIV`.`Veiculo`
+DROP TABLE IF EXISTS `desafioIV`.`Veiculo` ;
+
+CREATE TABLE IF NOT EXISTS `desafioIV`.`Veiculo` (
+  `idVeiculo` INT AUTO_INCREMENT PRIMARY KEY,
+  `cor` VARCHAR(45) NULL,
+  `placa` VARCHAR(45) NULL,
+  `Modelo_idModelo` INT NOT NULL,
+  CONSTRAINT `fk_Veiculo_Modelo1`
+    FOREIGN KEY (`Modelo_idModelo`)
+    REFERENCES `desafioIV`.`Modelo` (`idModelo`)
+);
+
+insert into Veiculo (cor, placa, modelo_idModelo)
+values('preto', 'khd1246', 1),
+('branco', 'las21345', 2),
+('azul', 're2313', 1),
+('vermelho', 'dsada546', 3),
+('branco', 'das465', 15),
+('preto', 'khd1246', 12),
+('amarelo', 'dsaq54689', 10),
+('branco', 'dsaq5468', 10),
+('verde', 'hgd54698', 5),
+('preto', 'lkj546', 4);
+
+-- Table `desafioIV`.`Cliente`
+DROP TABLE IF EXISTS `desafioIV`.`Cliente` ;
+
+CREATE TABLE IF NOT EXISTS `desafioIV`.`Cliente` (
+  `idCliente` INT AUTO_INCREMENT PRIMARY KEY,
+  `Pnome` VARCHAR(10) NOT NULL,
+  `NnomeInicial` VARCHAR(3) NULL,
+  `SobreNome` VARCHAR(20) NULL,
+  `CPF` CHAR(11) NOT NULL,
+  `Endereço` VARCHAR(45) NULL,
+  `Data_Nascimento` DATE NOT NULL
+);
+
+insert into Cliente(Pnome, NnomeInicial, SobreNome,  CPF, Endereço, Data_Nascimento)
+values('Gerdison', 'G', 'Dona', 123456789, 'tv humaita, belém','2000-10-01'),
+('Joao', 'J', 'Silva', 8796546, 'tv vilete, belém','2010-01-15'),
+('Pedro', 'P', 'Nascimento', 987543, 'tv estrela, belém','2001-12-27'),
+('Ryan', 'R', 'Dona', 825369, 'tv timbo, belém','2011-05-25'),
+('Jose', 'J', 'Coelho', 369714, 'tv chaco, belém','1985-12-16');
+
+
+-- Table `desafioIV`.`Mecanico`
+DROP TABLE IF EXISTS `desafioIV`.`Mecanico` ;
+
+CREATE TABLE IF NOT EXISTS `desafioIV`.`Mecanico` (
+  `idMecanico` INT AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(45) NULL,
+  `endereço` VARCHAR(45) NULL,
+  `especialidade` VARCHAR(45) NULL
+);
+
+insert into Mecanico(nome, endereço, especialidade)
+values('Joao', 'tv vilete, belém', 'motor'),
+('Marcelo', 'tv estrela, belém','Embreagem'),
+('Ryan', 'tv timbo, belém','pintura'),
+('Jose', 'tv chaco, belém','motor');
+
+-- Table `desafioIV`.`Equipe`
+DROP TABLE IF EXISTS `desafioIV`.`Equipe` ;
+
+CREATE TABLE IF NOT EXISTS `desafioIV`.`Equipe` (
+  `idEquipe` INT AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(45) NULL
+);
+
+insert into Equipe(nome)
+value('pintura'),
+('motor'),
+('embreagem');
+
+-- Table `desafioIV`.`Equipe_Mecanico`
+DROP TABLE IF EXISTS `desafioIV`.`Equipe_Mecanico` ;
+
+CREATE TABLE IF NOT EXISTS `desafioIV`.`Equipe_Mecanico` (
+  `idEquipe` INT,
+  `idMecanico` INT,
+   CONSTRAINT `fk_Equipe_Mecanico_Equipe`
+    FOREIGN KEY (`idEquipe`)
+    REFERENCES `desafioIV`.`Equipe` (`idEquipe`),
+   CONSTRAINT `fk_Equipe_Mecanico_Mecanico`
+    FOREIGN KEY (`idMecanico`)
+    REFERENCES `desafioIV`.`Mecanico` (`idMecanico`)
+);
+
+select * from equipe;
+insert into Equipe_Mecanico
+value(1, 3),
+(1, 2),
+(2,1),
+(2,4),
+(1,2);
+
+-- Table `desafioIV`.`TabelaMaoObra`
+DROP TABLE IF EXISTS `desafioIV`.`TabelaMaoObra` ;
+
+CREATE TABLE IF NOT EXISTS `desafioIV`.`TabelaMaoObra` (
+  `idTabelaMaoObra`  INT AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(45) NULL,
+  `valor` FLOAT NULL
+);
+
+insert into TabelaMaoObra (nome, valor)
+values ('pintura peça', 150),
+('motor', 250),
+('embreagem', 150);
+
+-- Table `desafioIV`.`Peça`
+DROP TABLE IF EXISTS `desafioIV`.`Peça` ;
+
+CREATE TABLE IF NOT EXISTS `desafioIV`.`Peça` (
+  `idPeça` INT AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(45) NULL,
+  `valor` FLOAT NULL
+);
+
+insert into Peça (nome, valor)
+values ('Tinta 250ml', 100),
+('oleo do motor', 50),
+('filtro do ar', 70),
+('fluito do freio', 50),
+('filtro do motor', 70),
+('pastilha de freio', 170);
+
+-- Table `desafioIV`.`AutorizaçãoServiço`
+DROP TABLE IF EXISTS `desafioIV`.`AutorizaçãoServiço` ;
+
+CREATE TABLE IF NOT EXISTS `desafioIV`.`AutorizaçãoServiço` (
+  `idAutorizaçãoServiço` INT AUTO_INCREMENT PRIMARY KEY,
+  `autorização` VARCHAR(45) NULL,
+  `Cliente_idCliente` INT NOT NULL,
+  CONSTRAINT `fk_AutorizaçãoServiço_Cliente1`
+    FOREIGN KEY (`Cliente_idCliente`)
+    REFERENCES `desafioIV`.`Cliente` (`idCliente`)
+);
+
+insert into AutorizaçãoServiço (autorização, Cliente_idCliente)
+values ('liberado', 1),
+('não autorizado', 2),
+('liberado', 3);
+
+-- Table `desafioIV`.`Serviço
+DROP TABLE IF EXISTS `desafioIV`.`Serviço` ;
+
+CREATE TABLE IF NOT EXISTS `desafioIV`.`Serviço` (
+  `idServiço` INT AUTO_INCREMENT PRIMARY KEY,
+  `Cliente_idCliente` INT NOT NULL,
+  `Veiculo_idVeiculo` INT NOT NULL,
+  `Equipe_idEquipe` INT NOT NULL,
+  `TabelaMaoObra_idTabelaMaoObra` INT NOT NULL,
+  `Status` enum ('liberado','aguardando','concluido'),
+  `TipoServiço` enum ('Revisão','manutenção'),
+  `AutorizaçãoServiço_idAutorizaçãoServiço` INT NOT NULL,
+  `valorTotalServiço` FLOAT NULL,
+  `dataServiço` DATE NULL,
+  CONSTRAINT `fk_Serviço_Cliente1`
+    FOREIGN KEY (`Cliente_idCliente`)
+    REFERENCES `desafioIV`.`Cliente` (`idCliente`),
+  CONSTRAINT `fk_Serviço_Veiculo1`
+    FOREIGN KEY (`Veiculo_idVeiculo`)
+    REFERENCES `desafioIV`.`Veiculo` (`idVeiculo`),
+  CONSTRAINT `fk_Serviço_Equipe1`
+    FOREIGN KEY (`Equipe_idEquipe`)
+    REFERENCES `desafioIV`.`Equipe` (`idEquipe`),
+  CONSTRAINT `fk_Serviço_TabelaMaoObra1`
+    FOREIGN KEY (`TabelaMaoObra_idTabelaMaoObra`)
+    REFERENCES `desafioIV`.`TabelaMaoObra` (`idTabelaMaoObra`),
+  CONSTRAINT `fk_Serviço_AutorizaçãoServiço1`
+    FOREIGN KEY (`AutorizaçãoServiço_idAutorizaçãoServiço`)
+    REFERENCES `desafioIV`.`AutorizaçãoServiço` (`idAutorizaçãoServiço`)
+);
+
+insert into Serviço(Cliente_idCliente, Veiculo_idVeiculo, Equipe_idEquipe, TabelaMaoObra_idTabelaMaoObra, Status, TipoServiço, AutorizaçãoServiço_idAutorizaçãoServiço, valorTotalServiço, dataServiço)
+values (1, 1, 1, 1, 'aguardando', 'revisão', 1, 1000, '2022-10-1'),
+(2, 2, 2, 1, 'liberado', 'revisão', 1, 1000, '2022-10-1'),
+(3, 10, 3, 1, 'aguardando', 'manutenção', 1, 1000, '2022-11-1'),
+(5, 10, 1, 1, 'concluido', 'revisão', 1, 1000, '2022-06-1'),
+(1, 8, 2, 1, 'liberado', 'revisão', 1, 1000, '2022-10-1'),
+(2, 1, 2, 1, 'aguardando', 'manutenção', 1, 1000, '2022-10-10'),
+(1, 6, 3, 1, 'concluido', 'manutenção', 1, 1000, '2022-7-1'),
+(4, 7, 3, 1, 'concluido', 'revisão', 1, 1000, '2022-08-1'),
+(5, 9, 1, 1, 'concluido', 'manutenção', 1, 1000, '2022-09-1');
+
+-- Table `desafioIV`.`ServiçoPeça`
+DROP TABLE IF EXISTS `desafioIV`.`ServiçoPeça` ;
+
+CREATE TABLE IF NOT EXISTS `desafioIV`.`ServiçoPeça` (
+  `Serviço_idServiço` INT NOT NULL,
+  `Peça_idPeça` INT NOT NULL,
+  `quantidade` INT NULL,
+  `valor` FLOAT NULL,
+  PRIMARY KEY (`Serviço_idServiço`, `Peça_idPeça`),
+  CONSTRAINT `fk_Serviço_has_Peça_Serviço1`
+    FOREIGN KEY (`Serviço_idServiço`)
+    REFERENCES `desafioIV`.`Serviço` (`idServiço`),
+  CONSTRAINT `fk_Serviço_has_Peça_Peça1`
+    FOREIGN KEY (`Peça_idPeça`)
+    REFERENCES `desafioIV`.`Peça` (`idPeça`)
+);
+select * from peça;
+select * from serviço;
+insert into ServiçoPeça (Serviço_idServiço, Peça_idPeça, quantidade, valor)
+values(1, 1, 10, 1000),
+(11, 2, 3, 150),
+(13, 6, 4, 680),
+(1, 5, 10, 700),
+(15, 4, 1, 50);
+
+-- Table `desafioIV`.`OrdemServiço`
+DROP TABLE IF EXISTS `desafioIV`.`OrdemServiço` ;
+
+CREATE TABLE IF NOT EXISTS `desafioIV`.`OrdemServiço` (
+  `idOrdemServiço`  INT AUTO_INCREMENT PRIMARY KEY,
+  `StatusOrdemServiço` enum ('liberado','aguardando','concluido'),
+  `dataEmissão` DATE NULL,
+  `dataConclusão` DATE NULL,
+  `valor` FLOAT NULL
+);
+
+insert into OrdemServiço(StatusOrdemServiço, dataEmissão, dataConclusão, valor)
+values ('aguardando', '2022-10-01', '2022-10-01', 1000),
+('liberado', '2022-10-01', '2022-10-01', 800),
+('liberado', '2022-10-01', '2022-10-01', 850),
+('concluido', '2022-10-01', '2022-10-01', 700);
+
+-- Table `desafioIV`.`OrdemServiço_has_Serviço`
+DROP TABLE IF EXISTS `desafioIV`.`OrdemServiço_has_Serviço` ;
+
+CREATE TABLE IF NOT EXISTS `desafioIV`.`OrdemServiço_has_Serviço` (
+  `OrdemServiço_idOrdemServiço` INT NOT NULL,
+  `Serviço_idServiço` INT NOT NULL,
+  PRIMARY KEY (`OrdemServiço_idOrdemServiço`, `Serviço_idServiço`),
+  CONSTRAINT `fk_OrdemServiço_has_Serviço_OrdemServiço1`
+    FOREIGN KEY (`OrdemServiço_idOrdemServiço`)
+    REFERENCES `desafioIV`.`OrdemServiço` (`idOrdemServiço`),
+  CONSTRAINT `fk_OrdemServiço_has_Serviço_Serviço1`
+    FOREIGN KEY (`Serviço_idServiço`)
+    REFERENCES `desafioIV`.`Serviço` (`idServiço`)
+);
+
+select * from serviço;
+insert into OrdemServiço_has_Serviço 
+values (1,1),
+(2,1),
+(3,11),
+(4,12),
+(1,14),
+(2,15),
+(3,16);
+
+/*
+* Algum Carros por cliente 
+*/
+select distinct m.nome as Modelo_Carro, v.cor, v.placa, c.pnome as Cliente 
+from serviço s
+left join cliente c on (s.cliente_idCliente = c.idcliente)
+left join veiculo v on (s.veiculo_idveiculo = v.idveiculo)
+left join modelo m on (v.modelo_idmodelo = m.idmodelo)
+order by c.pnome;
+
+/*
+* Relação de veiculos no montadora excluido a renualt
+*/
+select  m.nome, count(*)
+from 	montadora m
+left join 	modelo v on (v.Montadora_idMontadora = m.idMontadora)
+group by  m.nome
+having  m.nome <> 'Renault';
+
